@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Løgneren</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-color: #f8fafc;
+      --accent-color: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --spion-red: #ef4444;
+      --border-color: #334155;
+      --win-gold: #fbbf24;
+      --success-green: #10b981;
+    }
+
+    body { 
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      margin: 0; 
+      padding: 20px;
+      background: var(--bg-color); 
+      color: var(--text-color);
+      line-height: 1.0;
+    }
+
+    .container { max-width: 650px; margin: 0 auto; }
+
+    h2, h3 { color: var(--accent-color); text-align: center; letter-spacing: 1px; }
+    h2 { text-transform: uppercase; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+
+    .card { 
+      background: var(--card-bg); 
+      border-radius: 16px; 
+      padding: 24px; 
+      margin-bottom: 20px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      border: 1px solid var(--border-color);
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 12px;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    .rule-item {
+      background: rgba(255,255,255,0.03);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+    .rule-icon { font-size: 1.3rem; margin-bottom: 5px; display: block; }
+    .rule-title { font-size: 0.75rem; font-weight: 800; color: var(--accent-color); text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .rule-text { font-size: 0.7rem; color: #94a3b8; line-height: 1.2; }
+
+    label { display: block; margin-top: 15px; font-size: 0.9rem; color: #94a3b8; font-weight: 600; }
+
+    input[type="number"], input[type="text"], select { 
+      width: 100%; 
+      padding: 12px; 
+      margin-top: 6px; 
+      box-sizing: border-box; 
+      border: 1px solid var(--border-color); 
+      border-radius: 8px; 
+      background: #0f172a; 
+      color: white;
+      font-size: 1rem;
+    }
+
+    button { 
+      width: 100%;
+      padding: 14px; 
+      margin-top: 15px; 
+      border-radius: 8px; 
+      border: none; 
+      background: var(--accent-color); 
+      color: #0f172a; 
+      cursor: pointer; 
+      font-weight: 700; 
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    
+    #done-next { 
+      background: var(--success-green); 
+      color: white; 
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    #done-next:hover { background: #059669; transform: scale(1.02); }
+
+    .big-word { 
+      font-size: 32px; 
+      font-weight: 800; 
+      text-align: center; 
+      margin: 25px 0; 
+      color: #fff;
+      text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+      padding: 20px;
+      border: 2px dashed var(--accent-color);
+      border-radius: 12px;
+    }
+
+    .hidden { display: none !important; }
+    
+    .players-list { margin-top: 15px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .players-list ul { padding-left: 20px; margin: 5px 0; }
+    .players-list li { margin-bottom: 4px; font-size: 0.95rem; }
+    
+    .status { margin-top: 15px; font-weight: 600; color: var(--accent-color); text-align: center; border-top: 1px solid var(--border-color); padding-top: 10px; }
+    .error { color: var(--spion-red); margin-top: 8px; font-size: 0.9rem; text-align: center; }
+    
+    .win-banner {
+      font-size: 2rem;
+      font-weight: 900;
+      text-align: center;
+      margin: 20px 0;
+      text-transform: uppercase;
+      color: var(--win-gold);
+      text-shadow: 0 0 25px rgba(251, 191, 36, 0.5);
+      border: 3px solid var(--win-gold);
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    footer { text-align: center; margin-top: 40px; padding-top: 20px; font-size: 0.75rem; color: #475569; border-top: 1px solid #1e293b; }
+
+    #player-reveal { 
+      min-height: 180px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      background: rgba(56, 189, 248, 0.05);
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+
+    .role-reveal-box {
+        padding: 15px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        border-left: 4px solid var(--accent-color);
+        margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Løgneren</h2>
+
+  <div class="card" id="setup-card">
+    <div class="rules-grid">
+      <div class="rule-item">
+        <span class="rule-icon">⚙️</span>
+        <span class="rule-title">1. Oppsett</span>
+        <span class="rule-text">Velg antall spillere, Spioner og Løgnerer.</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">📱</span>
+        <span class="rule-title">2. Rolle</span>
+        <span class="rule-text">BORGERE får et ord, SPION får et lignende ord, LØGNEREN får ingenting.</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">💬</span>
+        <span class="rule-title">3. Hint</span>
+        <span class="rule-text">Si et ord som hinter til ordet ditt. LØGNEREN later som han fikk borgernes ord.</span>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">✅</span>
+        <span class="rule-title">4. Stem</span>
+        <span class="rule-text">Finn infiltratørene før de finner ut hva ordet er.</span>
+      </div>
+    </div>
+
+    <h3>Spillinnstillinger</h3>
+    <label>Antall spillere (min 3)
+      <input id="num_players" type="number" min="3" value="5">
+    </label>
+    <label>Antall Spioner
+      <input id="num_spioner" type="number" min="0" value="1">
+    </label>
+    <label>Antall Løgnerer
+      <input id="num_hh" type="number" min="0" value="1">
+    </label>
+    
+    <div id="spion-same-area" class="hidden">
+        <label>Skal alle spioner ha samme ord?
+          <select id="spion_same">
+            <option value="true" selected>Ja, samme ord</option>
+            <option value="false">Nei, forskjellige ord</option>
+          </select>
+        </label>
+    </div>
+
+    <label>Ordkilde
+      <select id="word_source">
+        <option value="bank" selected>Tilfeldig fra ordbank</option>
+        <option value="custom">Egendefinerte ord</option>
+      </select>
+    </label>
+
+    <div id="custom-pair" class="hidden">
+      <label>Ord for Borgere
+        <input id="custom_vanlig" type="text" placeholder="f.eks. Bil">
+      </label>
+      <label>Ord for Spioner (komma-separert)
+        <input id="custom_spion" type="text" placeholder="f.eks. Buss,Tog,Sykkel">
+      </label>
+    </div>
+
+    <button id="apply-settings">Start spillet</button>
+    <div id="setup-error" class="error"></div>
+  </div>
+
+  <div class="card hidden" id="registration-card">
+    <h3>Spiller <span id="reg-index">1</span> av <span id="reg-total"></span></h3>
+    <label>Skriv navnet ditt:
+      <input id="player-name" type="text" autocomplete="off" />
+    </label>
+    
+    <button id="show-word">Se mitt ord</button>
+
+    <div id="player-reveal" class="hidden">
+      <div class="big-word" id="revealed-word"></div>
+      <button id="done-next" class="hidden">TRYKK HER FØR DU GIR MOBILEN VIDERE</button>
+    </div>
+
+    <div id="registered-list" class="players-list"></div>
+  </div>
+
+  <div class="card hidden" id="game-info-card">
+    <h3>Spillet starter!</h3>
+    <div id="starter-info" style="text-align:center; font-size:1.1rem; margin:20px 0;"></div>
+    <button id="to-vote">Gå til avstemning</button>
+  </div>
+
+  <div class="card hidden" id="voting-card">
+    <h3>Eliminer én spiller</h3>
+    <div id="alive-players-area" class="players-list"></div>
+    
+    <label>Hvem skal ut?
+      <select id="eject-select"></select>
+    </label>
+    <button id="eject-btn">Avslør rolle</button>
+
+    <div id="eject-result"></div>
+
+    <div id="guess-area" class="hidden role-reveal-box">
+      <p><strong>En Løgner ble tatt!</strong> Hen skal nå gjette vanlig ord.</p>
+      <label>Gjett ordet:
+        <input id="hh-guess" type="text">
+      </label>
+      <button id="submit-guess">Send gjetning</button>
+    </div>
+
+    <div id="status-area" class="status"></div>
+  </div>
+
+  <div id="final-area" class="card hidden"></div>
+
+  <footer>
+      Laget av Elias Aanesland Strømme<br>
+      <span style="opacity:0.5; font-size:0.65rem;">Se vår personvernserklæring for informasjon om annonser.</span>
+  </footer>
+</div>
+
+<script>
+/* FULL ORDBANK FRA V12 */
+const ORDBANK = [
+  {vanlig:"seng", impostor:["pute","madrass","dyne"]},
+  {vanlig:"romskip", impostor:["helikopter","fly","satelitt"]},
+  {vanlig:"bil", impostor:["sykkel","motor","traktor"]},
+  {vanlig:"hytte", impostor:["leilighet","hus","campingvogn"]},
+  {vanlig:"kjøkken", impostor:["stue","bad","spisestue"]},
+  {vanlig:"eple", impostor:["pære","plomme","banan"]},
+  {vanlig:"bok", impostor:["tegneserie","avis","katalog"]},
+  {vanlig:"telefon", impostor:["radio","fjernkontroll","mobil"]},
+  {vanlig:"skole", impostor:["universitet","barnehage","bibliotek"]},
+  {vanlig:"skjorte", impostor:["genser","jakke","t-skjorte"]},
+  {vanlig:"hest", impostor:["esel","ku","ponni"]},
+  {vanlig:"tre", impostor:["busk","kongle","palme"]},
+  {vanlig:"vann", impostor:["juice","brus","melk"]},
+  {vanlig:"fjell", impostor:["bakke","dal","klippe"]},
+  {vanlig:"båt", impostor:["kano","kajakk","ferge"]},
+  {vanlig:"klokke", impostor:["stoppeklokke","alarm","gjøkur"]},
+  {vanlig:"lampe", impostor:["lyspære","lanterne","sol"]},
+  {vanlig:"katt", impostor:["hund","kanin","rotte"]},
+  {vanlig:"sko", impostor:["støvler","sandaler","innesko"]},
+  {vanlig:"butikk", impostor:["marked","kjøpesenter","kiosk"]},
+  {vanlig:"teater", impostor:["kino","opera","konsertsal"]},
+  {vanlig:"bilde", impostor:["plakat","tegning","foto"]},
+  {vanlig:"gitar", impostor:["fiolin","piano","trommer"]},
+  {vanlig:"is", impostor:["sorbet","milkshake","isbre"]},
+  {vanlig:"hage", impostor:["park","gress","inngangsparti"]},
+  {vanlig:"nøkkel", impostor:["kodelås","lås","kort"]},
+  {vanlig:"glass", impostor:["krus","vase","flaske"]},
+  {vanlig:"piano", impostor:["keyboard","orgel","synth"]},
+  {vanlig:"paraply", impostor:["regnjakke","støvel","hatt"]},
+  {vanlig:"kaffe", impostor:["te","kakao","espresso"]},
+  {vanlig:"bro", impostor:["tunnel","ferge","passasje"]},
+  {vanlig:"frimerke", impostor:["etikett","billett","kort"]},
+  {vanlig:"bamse", impostor:["dukke","figur","maskot"]},
+  {vanlig:"kjole", impostor:["skjørt","dress","tunika"]},
+  {vanlig:"kamera", impostor:["webcam","linse","drone"]},
+  {vanlig:"stol", impostor:["krakk","lenestol","benk"]},
+  {vanlig:"bakeri", impostor:["slakter","butikk","kafe"]},
+  {vanlig:"kart", impostor:["atlas","GPS","kompass"]},
+  {vanlig:"fyr", impostor:["lykt","hav","båt"]},
+  {vanlig:"nese", impostor:["øyne","munn","panne"]},
+  {vanlig:"flaske", impostor:["krukke","beholder","termokopp"]},
+  {vanlig:"hatt", impostor:["lue","caps","bøttehatt"]},
+  {vanlig:"tannbørste", impostor:["tannkrem","tannfloss","munnskyll"]},
+  {vanlig:"sykkel", impostor:["sparkesykkel","løpesykkel","motorsykkel"]},
+  {vanlig:"buss", impostor:["fly","tog","minibuss"]},
+  {vanlig:"trapp", impostor:["heis","rampe","stige"]},
+  {vanlig:"kjøleskap", impostor:["fryser","skuff","skap"]},
+  {vanlig:"ovn", impostor:["mikrobølgeovn","peis","varmluftovn"]},
+  {vanlig:"tallerken", impostor:["skål","gaffel","serveringsbrett"]},
+  {vanlig:"gaffel", impostor:["kniv","tang","spisepinne"]},
+  {vanlig:"lommebok", impostor:["veske","penger","pengepung"]},
+  {vanlig:"solbriller", impostor:["briller","glass","visir"]},
+  {vanlig:"kork", impostor:["lokk","propp","kumlokk"]},
+  {vanlig:"termometer", impostor:["vekter","barometer","klokke"]},
+  {vanlig:"trompet", impostor:["klarinett","saksofon","tuba"]},
+  {vanlig:"pute", impostor:["dyne","madrass","putevar"]},
+  {vanlig:"mopp", impostor:["kost","vaskefille","støvsuger"]},
+  {vanlig:"støv", impostor:["hybelkanin","smuss","pels"]},
+  {vanlig:"koffert", impostor:["ryggsekk","veske","tursekk"]},
+  {vanlig:"lommelykt", impostor:["lanterne","mobillykt","lys"]},
+  {vanlig:"klippe", impostor:["stein","fjell","dal"]},
+  {vanlig:"isbre", impostor:["fjell","isflak","isbjørn"]},
+  {vanlig:"håndkle", impostor:["klut","badekåpe","serviett"]},
+  {vanlig:"tannlege", impostor:["doktor","kiropraktor","sykepleier"]},
+  {vanlig:"sykehus", impostor:["politistasjon","legekontor","brannstasjon"]},
+  {vanlig:"bibliotek", impostor:["arkiv","kino","bokhandel"]},
+  {vanlig:"kontor", impostor:["landskap","møte","resepsjon"]},
+  {vanlig:"motor", impostor:["maskin","diesel","elektrisitet"]},
+  {vanlig:"håndtak", impostor:["dør","krok","skrue"]},
+  {vanlig:"strøm", impostor:["batteri","el-kjøp","kraftverk"]},
+  {vanlig:"kabel", impostor:["lader","tråd","fiber"]},
+  {vanlig:"HDMI", impostor:["kontakt","adapter","støpsel"]},
+  {vanlig:"putevar", impostor:["laken","dynetrekk","seng"]},
+  {vanlig:"hagebord", impostor:["benk","krakk","piknik"]},
+  {vanlig:"grill", impostor:["ovn","bål","steikepanne"]},
+  {vanlig:"tang", impostor:["avbitertang","skrutrekker","hammer"]},
+  {vanlig:"hammer", impostor:["slegge","pistol","klubbe"]},
+  {vanlig:"penger", impostor:["kort","mynt","valuta"]},
+  {vanlig:"flyplass", impostor:["stasjon","terminal","hangar"]},
+  {vanlig:"bensin", impostor:["bil","elektro","ladestasjon"]},
+  {vanlig:"sjokolade", impostor:["karamell","is","godteri"]},
+  {vanlig:"bølge", impostor:["straum","tidevann","død"]},
+  {vanlig:"strand", impostor:["svaberg","bukt","promenade"]},
+  {vanlig:"sol", impostor:["måne","stjerne","lys"]},
+  {vanlig:"måne", impostor:["sol","stjerne","planet"]},
+  {vanlig:"stjerne", impostor:["planet","måne","komet"]},
+  {vanlig:"robot", impostor:["droner","automater","taxi"]},
+  {vanlig:"overgang", impostor:["tunnel","bro","kryss"]},
+  {vanlig:"fyrstikk", impostor:["lighter","brenner","gnist"]},
+  {vanlig:"læring", impostor:["møte","kurs","seminar"]},
+  {vanlig:"eksamen", impostor:["test","quiz","presentasjon"]},
+  {vanlig:"konsert", impostor:["forestilling","teater","show"]},
+  {vanlig:"festival", impostor:["marked","messe","karneval"]},
+  {vanlig:"busskur", impostor:["søppelkasse","sauetunge","krydder"]},
+  {vanlig:"kran", impostor:["gravemaskin","heis","monteringsutstyr"]},
+  {vanlig:"skinne", impostor:["tog","jern","veikryss"]},
+  {vanlig:"hengsel", impostor:["dør","håndtak","krok"]},
+  {vanlig:"mus", impostor:["bever","rotte","oter"]},
+  {vanlig:"tastatur", impostor:["piano","skjerm","mus"]},
+  {vanlig:"skjerm", impostor:["PC","tv","display"]},
+  {vanlig:"skru", impostor:["bolt","mutter","skiftenøkkel"]},
+  {vanlig:"vifte", impostor:["ovn","klimaanlegg","lufting"]},
+  {vanlig:"bøtte", impostor:["spann","vase","badekar"]},
+  {vanlig:"saks", impostor:["kniv","tang","gressklipper"]},
+  {vanlig:"komfyr", impostor:["peis","grill","kokeplate"]},
+  {vanlig:"krus", impostor:["glass","kakao","termokopp"]},
+  {vanlig:"telys", impostor:["lysestake","kaffe","lampe"]},
+  {vanlig:"vindu", impostor:["speil","dør","vegg"]},
+  {vanlig:"ørn", impostor:["due","spettmeis","spurv"]},
+  {vanlig:"egg", impostor:["omelett","pannekake","kyllingvinge"]},
+  {vanlig:"ost", impostor:["smør","yoghurt","melk"]},
+  {vanlig:"skjærgård", impostor:["hav","holme","bukt"]},
+  {vanlig:"hammer", impostor:["spiker","drill","varktøyskap"]},
+  {vanlig:"arbeid", impostor:["penger","sosialisme","oppdrag"]},
+  {vanlig:"service", impostor:["anmeldelse","hjelp","kundesenter"]},
+  {vanlig:"batteri", impostor:["trådløs","celle","ampær"]},
+  {vanlig:"nettverk", impostor:["wifi","HDMI","tilkobling"]},
+  {vanlig:"app", impostor:["program","tjeneste","plattform"]},
+];
+
+const state = {
+  numPlayers:0, numSpioner:0, numHH:0,
+  vanligOrd:null, slots:[], players:[], roles:{},
+  currentRegIndex:0, hhGuessedCorrect: false,
+  awaitingHHGuess: false // <--- NY FLAGG: hindrer umiddelbar avslutning når HH må få gjette
+};
+
+document.getElementById('num_spioner').addEventListener('change', (e)=>{
+  document.getElementById('spion-same-area').classList.toggle('hidden', parseInt(e.target.value||'0')<=1);
+});
+
+document.getElementById('word_source').addEventListener('change', (e)=>{
+  document.getElementById('custom-pair').classList.toggle('hidden', e.target.value!=='custom');
+});
+
+document.getElementById('apply-settings').addEventListener('click', function() {
+  const np = parseInt(document.getElementById('num_players').value);
+  const ns = parseInt(document.getElementById('num_spioner').value);
+  const nhh = parseInt(document.getElementById('num_hh').value);
+  const sameWord = document.getElementById('spion_same').value === 'true';
+  const errEl = document.getElementById('setup-error');
+
+  if (np < 3) { errEl.textContent = "Minimum 3 spillere."; return; }
+  if (ns + nhh >= np) { errEl.textContent = "For mange roller."; return; }
+  errEl.textContent = "";
+
+if (ns === 0 && nhh === 0) {
+    errEl.textContent = "Velg minst 1 Spion eller 1 Løgner for å starte spillet";
+    return;
+  }
+
+  const ws = document.getElementById('word_source').value;
+  let chosenVanlig = "";
+  let chosenSpionList = [];
+
+  if (ws === 'bank') {
+    const entry = ORDBANK[Math.floor(Math.random()*ORDBANK.length)];
+    chosenVanlig = entry.vanlig;
+    chosenSpionList = entry.impostor;
+  } else {
+    chosenVanlig = document.getElementById('custom_vanlig').value || "Ord A";
+    chosenSpionList = (document.getElementById('custom_spion').value || "Ord B").split(',').map(s=>s.trim());
+  }
+
+  state.vanligOrd = chosenVanlig;
+  
+  let slots = [];
+  for(let i=0; i<(np-ns-nhh); i++) slots.push({r:'borger', o:chosenVanlig});
+  for(let i=0; i<nhh; i++) slots.push({r:'herrhvit', o:null});
+  
+  const sharedSpionWord = chosenSpionList[Math.floor(Math.random()*chosenSpionList.length)];
+  for(let i=0; i<ns; i++) {
+    let word = sameWord ? sharedSpionWord : chosenSpionList[i % chosenSpionList.length];
+    slots.push({r:'spion', o:word});
+  }
+  
+  state.slots = slots.sort(() => Math.random() - 0.5);
+  state.numPlayers = np;
+
+  document.getElementById('setup-card').classList.add('hidden');
+  document.getElementById('registration-card').classList.remove('hidden');
+  document.getElementById('reg-total').textContent = np;
+});
+
+document.getElementById('show-word').addEventListener('click', function() {
+  const nameInput = document.getElementById('player-name');
+  const name = nameInput.value.trim();
+  if (!name) return;
+
+  const slot = state.slots[state.currentRegIndex];
+  state.players.push(name);
+  state.roles[name] = {rolle: slot.r, ord: slot.o, alive: true};
+
+  const revealEl = document.getElementById('revealed-word');
+  if (slot.r === 'herrhvit') {
+    revealEl.innerHTML = "<span style='color:var(--accent-color)'>Du er en LØGNER</span><br><small style='font-size:1rem'>Du har ikke noe ord, men lat som at du har fått et ord!</small>";
+  } else {
+    revealEl.textContent = slot.o;
+  }
+
+  document.getElementById('player-reveal').classList.remove('hidden');
+  document.getElementById('done-next').classList.remove('hidden');
+  this.classList.add('hidden');
+  updateRegList();
+});
+
+document.getElementById('done-next').addEventListener('click', function() {
+  state.currentRegIndex++;
+  if (state.currentRegIndex >= state.numPlayers) {
+    document.getElementById('registration-card').classList.add('hidden');
+    document.getElementById('game-info-card').classList.remove('hidden');
+    
+    // FILTRERER UT LØGNER FRA STARTREKKEFØLGEN
+    const possibleStarters = state.players.filter(name => state.roles[name].rolle !== 'herrhvit');
+    const starter = possibleStarters[Math.floor(Math.random() * possibleStarters.length)];
+    
+    document.getElementById('starter-info').innerHTML = `Første person til å snakke: (følg deretter klokka)<br><strong style="color:var(--accent-color); font-size:1.5rem;">${starter}</strong>`;
+  } else {
+    document.getElementById('reg-index').textContent = state.currentRegIndex + 1;
+    document.getElementById('player-name').value = "";
+    document.getElementById('player-reveal').classList.add('hidden');
+    document.getElementById('show-word').classList.remove('hidden');
+    this.classList.add('hidden');
+  }
+});
+
+function updateRegList() {
+  document.getElementById('registered-list').innerHTML = "<strong>Registrerte:</strong><ul>" + state.players.map(p=>`<li>${p}</li>`).join('') + "</ul>";
+}
+
+document.getElementById('to-vote').addEventListener('click', function() {
+  document.getElementById('game-info-card').classList.add('hidden');
+  document.getElementById('voting-card').classList.remove('hidden');
+  refreshVotingUI();
+});
+
+function refreshVotingUI() {
+  const alive = state.players.filter(p => state.roles[p].alive);
+  const sel = document.getElementById('eject-select');
+  sel.innerHTML = "";
+  alive.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.textContent = p;
+    sel.appendChild(opt);
+  });
+  document.getElementById('alive-players-area').innerHTML = "<strong>Levende spillere:</strong><ul>" + alive.map(p=>`<li>${p}</li>`).join('') + "</ul>";
+  
+  const ns = alive.filter(p => state.roles[p].rolle === 'spion').length;
+  const nhh = alive.filter(p => state.roles[p].rolle === 'herrhvit').length;
+  document.getElementById('status-area').textContent = `Spioner igjen: ${ns} | Løgnerer igjen: ${nhh}`;
+}
+
+document.getElementById('eject-btn').addEventListener('click', function() {
+  const victim = document.getElementById('eject-select').value;
+  if (!victim) return;
+
+  state.roles[victim].alive = false;
+  const r = state.roles[victim].rolle;
+  const res = document.getElementById('eject-result');
+  res.className = "role-reveal-box";
+
+  if (r === 'borger') {
+    res.innerHTML = `💀 <strong>${victim}</strong> ble sendt ut... hen var en <strong>Borger</strong>.`;
+  } else if (r === 'spion') {
+    res.innerHTML = `🎯 Ja! <strong>${victim}</strong> ble sendt ut og var en <strong>Spion</strong>!`;
+  } else if (r === 'herrhvit') {
+    res.innerHTML = `🕵️ <strong>${victim}</strong> var <strong>Løgner</strong>!`;
+    // Sjekk om det finnes spioner igjen — hvis ikke: tillat HH å gjette før spillet avsluttes.
+    const spiesAlive = state.players.filter(p => state.roles[p].alive && state.roles[p].rolle === 'spion').length;
+    if (spiesAlive === 0) {
+      // Sett flagg for å indikere at vi venter på HH-gjetning — hindrer umiddelbar game-end.
+      state.awaitingHHGuess = true;
+    }
+    document.getElementById('guess-area').classList.remove('hidden');
+  }
+
+  refreshVotingUI();
+  checkGameEnd();
+});
+
+document.getElementById('submit-guess').addEventListener('click', function() {
+  const g = document.getElementById('hh-guess').value.trim().toLowerCase();
+  if (g === state.vanligOrd.toLowerCase()) {
+    state.hhGuessedCorrect = true;
+    // Klar — HH gjettet riktig, vi kan tilbakestille awaiting-flagget og avslutte.
+    state.awaitingHHGuess = false;
+    finishGame();
+  } else {
+    alert("Feil gjetning!");
+    document.getElementById('guess-area').classList.add('hidden');
+    // Hvis HH var den siste infiltratøren og gjetningen var feil, fortsetter vi spilletssluttsjekk.
+    state.awaitingHHGuess = false;
+    checkGameEnd();
+  }
+});
+
+function checkGameEnd() {
+  // Hvis vi venter på at en Løgner skal få gjette, skal ikke spillet avsluttes nå.
+  if (state.awaitingHHGuess) return;
+
+  const alive = state.players.filter(p => state.roles[p].alive);
+  const spies = alive.filter(p => state.roles[p].rolle === 'spion').length;
+  const hhs = alive.filter(p => state.roles[p].rolle === 'herrhvit').length;
+  const citizens = alive.filter(p => state.roles[p].rolle === 'borger').length;
+  
+  if (spies === 0 && hhs === 0) {
+    finishGame();
+  } 
+  else if ((spies + hhs) >= citizens) {
+    finishGame();
+  }
+}
+
+function finishGame() {
+  document.getElementById('voting-card').classList.add('hidden');
+  const final = document.getElementById('final-area');
+  final.classList.remove('hidden');
+
+  let winText = "";
+  let winColor = "var(--win-gold)";
+
+  const alive = state.players.filter(p => state.roles[p].alive);
+  const spies = alive.filter(p => state.roles[p].rolle === 'spion').length;
+  const hhs = alive.filter(p => state.roles[p].rolle === 'herrhvit').length;
+
+  if (state.hhGuessedCorrect) {
+    winText = "LØGNEREN GJETTET ORDET OG VANT!";
+    winColor = "var(--spion-red)";
+  } else if (spies === 0 && hhs === 0) {
+    winText = "GRATULERER, BORGERNE VANT!";
+  } else {
+    if (spies > 0 && hhs > 0) {
+      winText = "SPIONENE OG LØGNEREN VANT!";
+    } else if (spies > 0) {
+      winText = "SPIONENE VANT!";
+    } else {
+      winText = "LØGNEREN VANT!";
+    }
+    winColor = "var(--spion-red)";
+  }
+
+  let html = `<div class="win-banner" style="color:${winColor}; border-color:${winColor}">${winText}</div>`;
+  html += `<p style="text-align:center">Borgernes ord var: <strong>${state.vanligOrd}</strong></p>`;
+  html += `<div class="players-list"><strong>Fullstendig rolleliste:</strong><ul>`;
+  
+  state.players.forEach(p => {
+    const r = state.roles[p];
+    let rNavn = r.rolle === 'borger' ? 'Borger' : (r.rolle === 'spion' ? 'Spion' : 'Løgner');
+    html += `<li>${p}: ${rNavn} ${r.alive ? '(Overlevde)' : '(Eliminert)'}</li>`;
+  });
+  
+  html += `</ul></div><button onclick="location.reload()">Spill på nytt</button>`;
+  final.innerHTML = html;
+}
+</script>
+</body>
+</html>
