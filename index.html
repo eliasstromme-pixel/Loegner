@@ -224,7 +224,8 @@
     <label>Skriv navnet ditt:
       <input id="player-name" type="text" autocomplete="off" />
     </label>
-    
+
+
     <button id="show-word">Se mitt ord</button>
 
     <div id="player-reveal" class="hidden">
@@ -253,7 +254,7 @@
     <div id="eject-result"></div>
 
     <div id="guess-area" class="hidden role-reveal-box">
-      <p><strong>En Løgner ble tatt!</strong> Hen skal nå gjette vanlig ord.</p>
+      <p><strong>En Løgner ble tatt!</strong> Løgneren skal nå gjette vanlig ord.</p>
       <label>Gjett ordet:
         <input id="hh-guess" type="text">
       </label>
@@ -392,6 +393,89 @@ const ORDBANK = [
   {vanlig:"batteri", impostor:["trådløs","celle","ampær"]},
   {vanlig:"nettverk", impostor:["wifi","HDMI","tilkobling"]},
   {vanlig:"app", impostor:["program","tjeneste","plattform"]},
+  {vanlig:"bord", impostor:["hylle","kommode","benk"]},
+  {vanlig:"sky", impostor:["tåke","regn","vind"]},
+  {vanlig:"blomst", impostor:["plante","løv","krans"]},
+  {vanlig:"due", impostor:["insekt","flaggermus","ørn"]},
+  {vanlig:"penn", impostor:["blyant","spritusj","kritt"]},
+  {vanlig:"dør", impostor:["gulv","luke","vindu"]},
+  {vanlig:"brød", impostor:["kake","bolle","knekkebrød"]},
+  {vanlig:"hav", impostor:["innsjø","elv","bølge"]},
+  {vanlig:"lys", impostor:["flamme","bål","stjerne"]},
+  {vanlig:"frukt", impostor:["grønnsak","bær","nøtt"]},
+  {vanlig:"park", impostor:["skog","torg","lekeplass"]},
+  {vanlig:"vei", impostor:["sti","statsminister","elv"]},
+  {vanlig:"sovepose", impostor:["telt","liggeunderlag","hengekøye"]},
+  {vanlig:"fisk", impostor:["reke","krabbe","krokodille"]},
+  {vanlig:"telt", impostor:["hengekøye","presenning","skog"]},
+  {vanlig:"sekk", impostor:["pose","veske","handlenett"]},
+  {vanlig:"suppe", impostor:["gryterett","saus","buljong"]},
+  {vanlig:"blyant", impostor:["penn","viskelær","kritt"]},
+  {vanlig:"saks", impostor:["kniv","skalpell","barbermaskin"]},
+  {vanlig:"radio", impostor:["høyttaler","podkast","bassforsterker"]},
+  {vanlig:"såpe", impostor:["toalett","vaskemiddel","krem"]},
+  {vanlig:"sokker", impostor:["strømper","tights","leggbeskyttere"]},
+  {vanlig:"handlevogn", impostor:["trillebår","hestekjerre","sykkel"]},
+  {vanlig:"tåke", impostor:["sky","yr","regn"]},
+  {vanlig:"kake", impostor:["grateng","muffin","dessert"]},
+  {vanlig:"spade", impostor:["rake","(en) rive","hakke"]},
+  {vanlig:"kniv", impostor:["gaffel","skje","øks"]},
+  {vanlig:"leke", impostor:["spill","puslespill","aktivitet"]},
+  {vanlig:"sang", impostor:["melodi","dikt","rap"]},
+  {vanlig:"himmel", impostor:["sky","horisont","stjerner"]},
+  {vanlig:"vannkoker", impostor:["kaffetrakter","kjøkkenmaskin","brødrister"]},
+  {vanlig:"bær", impostor:["frukt","nøtt","druer"]},
+  {vanlig:"tå", impostor:["finger","hæl","ankel"]},
+  {vanlig:"lue", impostor:["hatt","skjerf","pannebånd"]},
+  {vanlig:"vaskemaskin", impostor:["tørketrommel","oppvaskmaskin","støvsuger"]},
+  {vanlig:"sopp", impostor:["mose","lav","plante"]},
+  {vanlig:"hanske", impostor:["sko","sokk","armbånd"]},
+  {vanlig:"kjøtt", impostor:["fisk","kylling","pølse"]},
+  {vanlig:"tromme", impostor:["trompet","gitar","fløyte"]},
+  {vanlig:"vind", impostor:["storm","bris","tåke"]},
+  {vanlig:"notat", impostor:["dagbok","handleliste","skisse"]},
+  {vanlig:"hånd", impostor:["tå","fot","finger"]},
+  {vanlig:"sykepleier", impostor:["lege","fysioterapeut","paramedic"]},
+  {vanlig:"postkasse", impostor:["søppeldunk","brevsprekk","skilt"]},
+  {vanlig:"trampoline", impostor:["huske","sklie","klatrestativ"]},
+  {vanlig:"gryte", impostor:["stekepanne","bålpanne","bolle"]},
+  {vanlig:"bly", impostor:["kull","grafitt","metall"]},
+  {vanlig:"leilighet", impostor:["rekkehus","hytte","loftsrom"]},
+  {vanlig:"badekar", impostor:["dusj","vask","jacuzzi"]},
+  {vanlig:"maleri", impostor:["skulptur","tegning","reklameskilt"]},
+  {vanlig:"vogn", impostor:["veske","handlevogn","tralle"]},
+  {vanlig:"tre", impostor:["skog","hekk","busker"]},
+  {vanlig:"kjøkkenbenk", impostor:["bord","hylle","skap"]},
+  {vanlig:"steinmur", impostor:["gjerde","hekk","port"]},
+  {vanlig:"klessnor", impostor:["tørkestativ","tørketrommel","tråd"]},
+  {vanlig:"sykkelhjelm", impostor:["caps","lue","bøff"]},
+  {vanlig:"kjøkkenvask", impostor:["kran","benk","avløpsrør"]},
+  {vanlig:"fuglekasse", impostor:["rede","bur","trehytte"]},
+  {vanlig:"hagemøbler", impostor:["benk","solseng","bord"]},
+  {vanlig:"mel", impostor:["sukker","salt","gelatin"]},
+  {vanlig:"sukker", impostor:["honning","sirup","søtstoff"]},
+  {vanlig:"eddik", impostor:["sitronsaft","vin","syltetøy"]},
+  {vanlig:"syltetøy", impostor:["nugatti","gele","honning"]},
+  {vanlig:"pasta", impostor:["ris","nudler","potet"]},
+  {vanlig:"ris", impostor:["hvete","bygg","havre"]},
+  {vanlig:"potet", impostor:["agurk","gulrot","kål"]},
+  {vanlig:"gulrot", impostor:["pastinakk","nepe","reddik"]},
+  {vanlig:"tomat", impostor:["paprika","agurk","chili"]},
+  {vanlig:"agurk", impostor:["aubergine","salat","pickle"]},
+  {vanlig:"salat", impostor:["spinat","kål","rukola"]},
+  {vanlig:"bønner", impostor:["erter","islam","kristendommen"]},
+  {vanlig:"egg", impostor:["melk","yoghurt","smør"]},
+  {vanlig:"kylling", impostor:["kalkun","and","vaktel"]},
+  {vanlig:"okse", impostor:["svin","lam","geit"]},
+  {vanlig:"ørken", impostor:["regnskog","fjelltopp","tundra"]},
+  {vanlig:"Eiffeltårnet", impostor:["Big Ben","Frihetsgudinnen","Colosseum"]},
+  {vanlig:"Pyramider", impostor:["Sphinx","Akvedukt","Kloster"]},
+  {vanlig:"Colosseum", impostor:["Parthenon","Pantheon","Akropolis"]},
+  {vanlig:"Big Ben", impostor:["Eiffeltårnet","Tower Bridge","London Eye"]},
+  {vanlig:"Frihetsgudinnen", impostor:["Kristusstatuen i Rio","Eiffeltårnet","Mount Rushmore"]},
+  {vanlig:"Den Kinesiske Mur", impostor:["Berlinmuren","Klagemuren i Jerusalem","Jeriko"]},
+  {vanlig:"Sydney Opera House", impostor:["Nasjonalmuseet","Louvre","Oslo Opera"]},
+  {vanlig:"Supermann", impostor:["Batman","Iron Man","Spider Man"]},
 ];
 
 const state = {
@@ -536,7 +620,7 @@ document.getElementById('eject-btn').addEventListener('click', function() {
   res.className = "role-reveal-box";
 
   if (r === 'borger') {
-    res.innerHTML = `💀 <strong>${victim}</strong> ble sendt ut... hen var en <strong>Borger</strong>.`;
+    res.innerHTML = `💀 <strong>${victim}</strong> ble sendt ut... og var en <strong>Borger</strong>.`;
   } else if (r === 'spion') {
     res.innerHTML = `🎯 Ja! <strong>${victim}</strong> ble sendt ut og var en <strong>Spion</strong>!`;
   } else if (r === 'herrhvit') {
